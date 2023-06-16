@@ -1,0 +1,14 @@
+#!/bin/bash
+
+gcloud compute instances create grunner-test \
+    --project s3cme1 \
+    --zone us-west1-c \
+    --machine-type e2-medium \
+    --service-account grunner-sa@s3cme1.iam.gserviceaccount.com \
+    --scopes https://www.googleapis.com/auth/cloud-platform \
+    --image ubuntu-2204-jammy-v20230616 \
+    --image-project ubuntu-os-cloud \
+    --labels "environment=test,stack=github,component=runner"
+
+# gcloud compute ssh grunner-test --zone us-west1-c --project s3cme1
+

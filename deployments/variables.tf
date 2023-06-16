@@ -13,8 +13,8 @@ variable "name" {
   nullable    = false
 }
 
-variable "location" {
-  description = "Deployment location (region)"
+variable "region" {
+  description = "Deployment region (us-west1)"
   default     = "us-west1"
   type        = string
   nullable    = false

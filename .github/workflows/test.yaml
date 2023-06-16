@@ -7,7 +7,7 @@ permissions:
   
 jobs:
   show-auth:
-    name: Test self-hosted runner
+    name: Test runner
     permissions:
       contents: read
     runs-on: self-hosted
