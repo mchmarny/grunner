@@ -1,5 +1,0 @@
-{
-    "yaml.schemas": {
-        "https://json.schemastore.org/github-workflow.json": "file:///Users/mchmarny/dev/grunner/workflows/test.yaml"
-    }
-}
