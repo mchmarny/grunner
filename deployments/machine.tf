@@ -1,16 +1,6 @@
 # VM template for runner
 resource "google_compute_instance_template" "runner_template" {
   name        = "${var.name}-template"
-  description = "Used to create runner instances."
-
-  tags = ["${var.name}"]
-
-  labels = {
-    environment = "test"
-    stack       = "github"
-    component   = "runner"
-  }
-
   machine_type = var.machine
   region       = var.region
 
@@ -24,14 +14,12 @@ resource "google_compute_instance_template" "runner_template" {
     disk_type    = "pd-standard"
     source_image = "ubuntu-2204-jammy-v20230616"
     disk_size_gb = 10 # TODO: Parameterize
+    boot         = true
+    auto_delete  = true
   }
 
   network_interface {
     network = "default"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 
   service_account {
@@ -40,10 +28,21 @@ resource "google_compute_instance_template" "runner_template" {
   }
 
   metadata_startup_script = "${file("../scripts/startup")}"
-
   metadata = {
     enable-guest-attributes = "true"
     enable-osconfig         = "true"
+  }
+
+  tags = ["${var.name}"]
+
+  labels = {
+    environment = "test"
+    stack       = "github"
+    component   = "runner"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -61,9 +60,5 @@ resource "google_compute_region_instance_group_manager" "mig" {
   timeouts {
     create = "15m"
     update = "15m"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
