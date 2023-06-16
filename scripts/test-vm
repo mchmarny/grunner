@@ -10,5 +10,8 @@ gcloud compute instances create grunner-test \
     --image-project ubuntu-os-cloud \
     --labels "environment=test,stack=github,component=runner"
 
+# SSH into the Vm
 # gcloud compute ssh grunner-test --zone us-west1-c --project s3cme1
 
+# Delete the VM
+# gcloud compute instances delete grunner-test --project s3cme1 --zone us-west1-c

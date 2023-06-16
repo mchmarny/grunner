@@ -8,27 +8,32 @@ sudo apt-get -y install jq
 secrets=$(gcloud secrets versions access latest --secret="grunner")
 
 # set secrets as env vars
-# shellcheck disable=SC2206
 while IFS= read -r line; do
     var="$(echo -e "${line}" | tr -d '[:space:]' | tr -d '"')"
     export "${var?}"
 done <<< "$secrets"
 
-# Create a folder
-mkdir actions-runner && cd actions-runner
+# Create folders
+mkdir workspace
+mkdir runner && cd runner
 
 # github runner version
 GH_RUNNER_VERSION="2.305.0"
 
 # Download the latest runner package
-curl -o actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz \
+curl -o runner.tar.gz \
      -L https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz
 
 # Extract installer
-$ tar xzf ./actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz
+tar xzf ./runner.tar.gz
+rm -f ./runner.tar.gz
 
-# Get token
-GH_TOKEN="$(curl -sS \
+# Dependencies
+sudo bin/installdependencies.sh
+
+# Get config variables 
+ACTIONS_RUNNER_INPUT_NAME=$HOSTNAME
+ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS \
   -X POST \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer ${token}" \
@@ -36,7 +41,14 @@ GH_TOKEN="$(curl -sS \
   "https://api.github.com/repos/${repo}/actions/runners/registration-token" | jq -r .token)"
 
 # Configure runner
-RUNNER_ALLOW_RUNASROOT=1 ./config.sh --unattended --url "https://github.com/${repo}" --token "$GH_TOKEN"
+RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
+  --unattended \
+  --replace \
+  --work "../workspace" \
+  --url "https://github.com/${repo}" \
+  --token "$ACTIONS_RUNNER_INPUT_TOKEN" \
+  --labels grunner
 
-# Run it
-./run.sh
+# Install and start runner service
+sudo ./svc.sh install
+sudo ./svc.sh start

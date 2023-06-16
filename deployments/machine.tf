@@ -10,10 +10,11 @@ resource "google_compute_instance_template" "runner_template" {
     preemptible         = false
   }
 
+  # TODO: Parameterize the disk
   disk {
     disk_type    = "pd-standard"
     source_image = "ubuntu-2204-jammy-v20230616"
-    disk_size_gb = 10 # TODO: Parameterize
+    disk_size_gb = 10
     boot         = true
     auto_delete  = true
   }
@@ -27,8 +28,9 @@ resource "google_compute_instance_template" "runner_template" {
     scopes = ["cloud-platform"]
   }
 
-  metadata_startup_script = "${file("../scripts/startup")}"
   metadata = {
+    startup_script          = "${file("../scripts/startup")}"
+    shutdown-script         = "${file("../scripts/shutdown")}"
     enable-guest-attributes = "true"
     enable-osconfig         = "true"
   }
