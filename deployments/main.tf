@@ -5,12 +5,14 @@ locals {
   services = [
     "cloudresourcemanager.googleapis.com",
     "compute.googleapis.com",
+    "compute.googleapis.com",
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "monitoring.googleapis.com",
     "secretmanager.googleapis.com",
     "servicecontrol.googleapis.com",
     "servicemanagement.googleapis.com",
+    "vpcaccess.googleapis.com",
   ]
 }
 

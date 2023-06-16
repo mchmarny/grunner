@@ -1,17 +1,11 @@
-# VM template for runner
-resource "random_id" "id" {
-	  byte_length = 4
-}
-
 resource "google_compute_instance_template" "runner_template" {
-  name        = "${var.name}-template-${random_id.id.hex}"
+  name         = "${var.name}-template"
   machine_type = var.machine
   region       = var.region
 
   scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
-    preemptible         = false
   }
 
   # TODO: Parameterize the disk
@@ -23,11 +17,9 @@ resource "google_compute_instance_template" "runner_template" {
     auto_delete  = true
   }
 
+  // TODO: Put it into a VPC
   network_interface {
     network = data.google_compute_network.default.self_link
-    access_config {
-      // Ephemeral IP
-    }
   }
 
   service_account {

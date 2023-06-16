@@ -1,6 +1,8 @@
 # grunner
 
-GitHub Actions private runner on GCP
+Private runner for GitHub Actions on GCP
+
+![](assets/runners.png)
 
 ## setup 
 
@@ -46,8 +48,6 @@ make apply
 
 Check that at least one runner is registered by navigating to: https://github.com/<owner>/<repo>/settings/actions/runners 
 
-![](assets/runners.png)
-
 ## usage
 
 Your GitHub Actions workflows are same as with the managed runner. The only update is the `runs-on` value, which is not set to `self-hosted`
@@ -75,9 +75,3 @@ make destroy
 ## Disclaimer
 
 This is my personal project and it does not represent my employer. While I do my best to ensure that everything works, I take no responsibility for issues caused by this code.
-
-
-
-
-
-
