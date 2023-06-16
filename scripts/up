@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# install
+apt-get update
+apt-get -y install jq
+
+# access secret from secretsmanager
+secrets=$(gcloud secrets versions access latest --secret="grunner")
+
+# set secrets as env vars
+# shellcheck disable=SC2206
+while IFS= read -r line; do
+    var="$(echo -e "${line}" | tr -d '[:space:]')"
+    export "${var?}"
+done <<< "$secrets"
+
+# github runner version
+GH_RUNNER_VERSION="2.305.0"
+
+# get actions binary
+curl -o actions.tar.gz --location "https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz"
+
+mkdir /runner
+mkdir /runner-tmp
+tar -zxf actions.tar.gz --directory /runner
+rm -f actions.tar.gz
+/runner/bin/installdependencies.sh
+
+# get actions token
+# shellcheck disable=SC2034
+# ACTIONS_RUNNER_INPUT_NAME is used by config.sh
+ACTIONS_RUNNER_INPUT_NAME=$HOSTNAME
+ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS --request POST --url "https://api.github.com/repos/${repo}/actions/runners/registration-token" --header "authorization: Bearer ${token}"  --header 'content-type: application/json' | jq -r .token)"
+
+# configure runner
+RUNNER_ALLOW_RUNASROOT=1 /runner/config.sh --unattended --replace --work "/runner-tmp" --url "https://github.com/${repo}" --token "$ACTIONS_RUNNER_INPUT_TOKEN" --labels grunner
+
+# install and start runner service
+cd /runner || exit
+./svc.sh install
+./svc.sh start

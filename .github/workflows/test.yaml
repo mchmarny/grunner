@@ -1,0 +1,21 @@
+name: test
+
+on: [push]
+
+permissions:
+  contents: read
+  
+jobs:
+  show-auth:
+    name: Test self-hosted runner
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v3.5.2
+
+    - name: Setup Cloud SDK'
+      uses: google-github-actions/setup-gcloud@e30db14379863a8c79331b04a9969f4c1e225e0b  # c1.1.1
+
+    - run: |-
+        gcloud auth list
