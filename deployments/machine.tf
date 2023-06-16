@@ -88,9 +88,9 @@ resource "google_compute_instance_template" "runner_template" {
     scopes = ["cloud-platform"]
   }
 
+  metadata_startup_script = "${file("../scripts/startup")}"
+
   metadata = {
-    startup-script          = "${file("../scripts/up")}"
-    shutdown-script         = "${file("../scripts/down")}"
     enable-guest-attributes = "true"
     enable-osconfig         = "true"
   }

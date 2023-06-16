@@ -23,7 +23,7 @@ resource "google_project_iam_member" "ci_sa" {
 # Identiy pool for GitHub action based identity's access to Google Cloud resources
 resource "google_iam_workload_identity_pool" "ci_pool" {
   provider                  = google-beta
-  workload_identity_pool_id = "${var.name}-pool"
+  workload_identity_pool_id = "${var.name}-id-pool"
 }
 
 # Configuration for GitHub identiy provider
