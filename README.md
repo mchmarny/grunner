@@ -4,6 +4,14 @@ Self-hosted GitHub Actions runner on GCP using GCE.
 
 ![](assets/overview.png)
 
+* GCE VMs in Managed Instance Groups (MIGs)
+* Customizable runner:
+*   VMs (image type, CPU, memory)
+*   MIG (size of runner group)
+* Configurable tooling (startup/shutdown script)
+* User-defined IAM service account
+* Unique GitHub token for each runner
+
 > Use private repo when using this template. Forks of a public repository could potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow. More on self-hosted runner security [here](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security).
 
 ## prerequisites
