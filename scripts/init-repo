@@ -12,13 +12,13 @@ user=$(echo $repo | cut -d/ -f1)
 name=$(echo $repo | cut -d/ -f2)
 
 # update all references to the upstream org/repo name
-grep -RiIl --exclude-dir={.git,tools} 'grunner' |
+grep -RiIl --exclude-dir={.git} 'grunner' |
   xargs sed -i '' \
     -e  "s!mchmarny/grunner!${repo}!g" \
     -e "s/grunner/${name}/g"
 
 # update all references to the upstream user name
-grep -RiIl --exclude-dir={.git,tools} 'mchmarny' |
+grep -RiIl --exclude-dir={.git} 'mchmarny' |
   xargs sed -i '' \
     -e  "s/mchmarny/${user}/g"
 
