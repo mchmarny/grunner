@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# This script is used to initialize a new repository by 
+# replacing the placeholders in the template with the
+# values from the upstream repository.
+
+# get the upstream user and repo name
+repo=$(git config --get remote.origin.url | cut -d: -f2 | cut -d. -f1)
+user=$(echo $repo | cut -d/ -f1)
+name=$(echo $repo | cut -d/ -f2)
+
+# update all references to the upstream org/repo name
+grep -RiIl --exclude-dir={.git,tools} 'grunner' |
+  xargs sed -i '' \
+    -e  "s!mchmarny/grunner!${repo}!g" \
+    -e "s/grunner/${name}/g"
+
+# update all references to the upstream user name
+grep -RiIl --exclude-dir={.git,tools} 'mchmarny' |
+  xargs sed -i '' \
+    -e  "s/mchmarny/${user}/g"
+
+# reset the version
+echo "v0.0.1" > .version
