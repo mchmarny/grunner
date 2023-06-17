@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+list=$(gh run list -s queued --json databaseId --jq '.[0].databaseId')
+
+if [ -z "$list" ]; then
+  echo "No queued workflows found"
+  exit 0
+fi
+
+# For each workflow, cancel it
+for id in $list; do
+  echo "Cancelling workflow $id..."
+  gh run cancel $id
+done
