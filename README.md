@@ -52,7 +52,7 @@ Create GCS bucket to store Terraform state. Couple of things to keep in mind:
 ```shell
 gcloud storage buckets create \
     gs://grunner-terraform-state \
-    --project s3cme1 \
+    --project $PROJECT_ID \
     --location us-west1
 ```
 
