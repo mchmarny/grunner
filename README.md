@@ -19,7 +19,7 @@ machine = "e2-medium"
 vms     = 3
 image   = "ubuntu-2204-jammy-v20230616"
 size    = 10
-repo    = "your-github-username/grunner"
+repo    = "mchmarny/grunner"
 token    = "<github-pat>"
 ```
 
@@ -27,7 +27,7 @@ token    = "<github-pat>"
 
 Create GCS bucket to store Terraform state. Couple of things to keep in mind: 
 
-* Bucket name has to be globally unique (the one in example below is mind)
+* Bucket name has to be globally unique
 * The `project` flag value should match the values from `deployments/terraform.tfvars` 
 * Bucket name must match the name in `deployments/backend.tf`. 
 
