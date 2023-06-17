@@ -6,9 +6,29 @@ Self-hosted GitHub Actions runner on GCP using GCE.
 
 > Use private repo when using this template. Forks of a public repository could potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow. More on self-hosted runner security [here](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security).
 
+## prerequisites 
+
+Since you are interested in self-hosted runners on GCP, you probably already have GCP account and a project. If not, [see](https://cloud.google.com/resource-manager/docs/creating-managing-projects). 
+
+You will also need `gcloud`. You can find instructions on how to install it [here](https://cloud.google.com/sdk/docs/install). Mak sure to authenticate:
+  
+```shell
+gcloud auth application-default login
+```
+
 ## setup 
 
-Create Terraform variables file: `deployments/terraform.tfvars`:
+Start by initializing the repo: 
+
+> This will update all repo specific names from the template to your new repo name. 
+
+```shell
+scripts/init-repo
+```
+
+Next, create Terraform variables file: `deployments/terraform.tfvars`:
+
+> Update as necessary. The number of VMs, the image type, and its size will depend on your use-case. The GitHub Personal Access Tokens (PAT) is only needed for obtain registration token for each VM. You can find more about PATs [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
 ```shell
 name    = "grunner"
@@ -22,8 +42,6 @@ size    = 10
 repo    = "mchmarny/grunner"
 token    = "<github-pat>"
 ```
-
-> Update as necessary, the GitHub PAT is only needed for obtain registration token for each VM. See [scripts/startup](scripts/startup) for usage.
 
 Create GCS bucket to store Terraform state. Couple of things to keep in mind: 
 
