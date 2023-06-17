@@ -2,11 +2,11 @@
 
 Self-hosted GitHub Actions runner on GCP using GCE.
 
-![](assets/runners.png)
+![](assets/overview.png)
 
 > Use private repo when using this template. Forks of a public repository could potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow. More on self-hosted runner security [here](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security).
 
-## prerequisites 
+## prerequisites
 
 Since you are interested in self-hosted runners on GCP, you probably already have GCP account and a project. If not, [see](https://cloud.google.com/resource-manager/docs/creating-managing-projects). 
 
@@ -72,6 +72,8 @@ terraform apply
 ```
 
 Check that at least one runner is registered by navigating to: https://github.com/$OWNER/$REPO/settings/actions/runners 
+
+![](assets/runners.png)
 
 ## usage
 
