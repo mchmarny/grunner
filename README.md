@@ -10,22 +10,26 @@ Private runner for GitHub Actions on GCP
 
 Create Terraform variables file: `deployments/terraform.tfvars`:
 
-> Update as necessary, the GitHub PAT is only needed for obtain registration token for each VM. See [scripts/startup](scripts/startup) for usage.
-
 ```shell
-name     = "grunner"
-project  = "s3cme1"
-region   = "us-west1"
-zone     = "c"
-machine  = "e2-medium"
-vms      = 2
-repo     = "mchmarny/grunner"
+name    = "grunner"
+project = "your-project-id"
+region  = "us-west1"
+zone    = "c"
+machine = "e2-medium"
+vms     = 3
+image   = "ubuntu-2204-jammy-v20230616"
+size    = 10
+repo    = "your-github-username/grunner"
 token    = "<github-pat>"
 ```
 
-Create GCS bucket to store Terraform state:
+> Update as necessary, the GitHub PAT is only needed for obtain registration token for each VM. See [scripts/startup](scripts/startup) for usage.
 
-> Note, the `project` and `location` flag values should match the values from `deployments/terraform.tfvars`. Also, the name of the bucket must match the name in deployments/backend.tf
+Create GCS bucket to store Terraform state. Couple of things to keep in mind: 
+
+* Bucket name has to be globally unique (the one in example below is mind)
+* The `project` flag value should match the values from `deployments/terraform.tfvars` 
+* Bucket name must match the name in `deployments/backend.tf`. 
 
 ```shell
 gcloud storage buckets create \
@@ -34,10 +38,11 @@ gcloud storage buckets create \
     --location us-west1
 ```
 
-When done, initialize Terraform:
+When done, navigate into the [./deployments](./deployments) directory and initialize Terraform:
 
 ```shell
-make init
+cd deployments
+terraform init
 ```
 
 ## deploy
@@ -45,7 +50,7 @@ make init
 Assuming the above `setup` has been configured, you can now deploy the private GitHub Runner:
 
 ```shell
-make apply
+terraform apply
 ```
 
 Check that at least one runner is registered by navigating to: https://github.com/<owner>/<repo>/settings/actions/runners 
@@ -120,7 +125,7 @@ To destroy all resources created by this demo:
 > Note, make sure to enter `yes` when prompted.
 
 ```shell
-make destroy
+terraform destroy
 ```
 
 ## Disclaimer

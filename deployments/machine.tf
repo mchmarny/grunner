@@ -14,8 +14,8 @@ resource "google_compute_instance_template" "runner_template" {
   # TODO: Parameterize the disk
   disk {
     disk_type    = "pd-ssd"
-    source_image = "ubuntu-2204-jammy-v20230616"
-    disk_size_gb = 10
+    source_image = var.image
+    disk_size_gb = var.size
     boot         = true
     auto_delete  = true
   }

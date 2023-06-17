@@ -47,6 +47,20 @@ variable "machine" {
   nullable    = false
 }
 
+variable "size" {
+  description = "GCE machine size in GBs (10)"
+  default     = 10
+  type        = number
+  nullable    = false
+}
+
+variable "image" {
+  description = "GCE machine image (e.g. ubuntu-2204-jammy-v20230616)"
+  default     = "ubuntu-2204-jammy-v20230616"
+  type        = string
+  nullable    = false
+}
+
 variable "token" {
   description = "GitHub Personal Access Token"
   type        = string
