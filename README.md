@@ -53,7 +53,7 @@ Assuming the above `setup` has been configured, you can now deploy the private G
 terraform apply
 ```
 
-Check that at least one runner is registered by navigating to: https://github.com/<owner>/<repo>/settings/actions/runners 
+Check that at least one runner is registered by navigating to: https://github.com/$OWNER/$REPO/settings/actions/runners 
 
 ## usage
 
@@ -71,7 +71,7 @@ jobs:
 
 ## debug
 
-If VM starts but you do not see the runners registered in GitHub Settings (https://github.com/<owner>/<repo>/settings/actions/runners)
+If VM starts but you do not see the runners registered in GitHub Settings (https://github.com/$OWNER/$REPO/settings/actions/runners)
 
 Start by listing the instances: 
 
