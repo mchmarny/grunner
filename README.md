@@ -4,6 +4,8 @@ Private runner for GitHub Actions on GCP
 
 ![](assets/runners.png)
 
+> If you use this template repo it's recommended that you only use self-hosted runners with a private repo, otherwise potentially dangerous code can be submitted as PR which your runner then would execute. Yes, the runners for this template repo have been disabled 😁
+
 ## setup 
 
 Create Terraform variables file: `deployments/terraform.tfvars`:
