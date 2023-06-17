@@ -1,10 +1,10 @@
 # grunner
 
-Private runner for GitHub Actions on GCP
+Self-hosted GitHub Actions runner on GCP using GCE.
 
 ![](assets/runners.png)
 
-> If you use this template repo it's recommended that you only use self-hosted runners with a private repo, otherwise potentially dangerous code can be submitted as PR which your runner then would execute. Yes, the runners for this template repo have been disabled 😁
+> Use private repo when using this template. Forks of a public repository could potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow. More on self-hosted runner security [here](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security).
 
 ## setup 
 
@@ -128,6 +128,6 @@ To destroy all resources created by this demo:
 terraform destroy
 ```
 
-## Disclaimer
+## disclaimer
 
 This is my personal project and it does not represent my employer. While I do my best to ensure that everything works, I take no responsibility for issues caused by this code.
