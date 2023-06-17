@@ -6,8 +6,8 @@ Self-hosted GitHub Actions runner on GCP using GCE.
 
 * GCE VMs in Managed Instance Groups (MIGs)
 * Customizable runner:
-*   VMs (image type, CPU, memory)
-*   MIG (size of runner group)
+  * VMs (image type, CPU, memory)
+  * MIG (size of runner group)
 * Configurable tooling (startup/shutdown script)
 * User-defined IAM service account
 * Unique GitHub token for each runner
