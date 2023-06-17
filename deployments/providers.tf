@@ -1,28 +1,28 @@
-# Description: This file contains the provider configuration for the project
+# Description: This file contains the provider configuration for the project.
 
 # Configure the Google Cloud provider
 terraform {
-  required_version = ">= 1.1"
+  required_version = "~> 1.4"
 
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.4"
+      version = "~> 4.69"
     }
 
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.4"
+      version = "~> 4.69"
     }
   }
 }
 
-# Configure the Google Cloud provider
+# Configure provider.
 provider "google" {
   project = var.project
 }
 
-# Configure the beta version of Google Cloud provider
+# Configure beta provider.
 provider "google-beta" {
   project = var.project
 }

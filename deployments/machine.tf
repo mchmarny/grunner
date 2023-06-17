@@ -3,6 +3,9 @@ resource "google_compute_instance_template" "runner_template" {
   machine_type = var.machine
   region       = var.region
 
+  instance_description = "${var.name} vm"
+  can_ip_forward       = false
+
   scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
@@ -20,6 +23,9 @@ resource "google_compute_instance_template" "runner_template" {
   // TODO: Put it into a VPC
   network_interface {
     network = data.google_compute_network.default.self_link
+    access_config {
+      // Ephemeral public IP
+    }
   }
 
   service_account {
@@ -47,18 +53,15 @@ resource "google_compute_instance_template" "runner_template" {
   }
 }
 
+
 resource "google_compute_region_instance_group_manager" "mig" {
   name               = "${var.name}-mig"
-  base_instance_name = var.name
   region             = var.region
+  base_instance_name = var.name
   target_size        = var.vms
 
   version {
+    name              = "${var.name} template"
     instance_template = google_compute_instance_template.runner_template.self_link_unique
-  }
-
-  timeouts {
-    create = "15m"
-    update = "15m"
   }
 }

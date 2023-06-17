@@ -62,6 +62,55 @@ jobs:
     ...
 ```
 
+## debug
+
+If VM starts but you do not see the runners registered in GitHub Settings (https://github.com/<owner>/<repo>/settings/actions/runners)
+
+Start by listing the instances: 
+
+```shell
+gcloud compute instances list --filter "tags.items=grunner" --project $PROJECT_ID
+```
+
+The response should look something like this: 
+
+```shell
+NAME          ZONE        MACHINE_TYPE  INTERNAL_IP  EXTERNAL_IP  STATUS
+grunner-5hdz  us-west1-b  e2-medium     10.138.0.55  *.*.*.*      RUNNING
+grunner-98c6  us-west1-c  e2-medium     10.138.0.50  *.*.*.*      RUNNING
+...
+```
+
+Pick one of the VMs and connect to it using SSH: 
+
+```shell
+gcloud compute ssh grunner-5hdz \
+  --tunnel-through-iap \
+  --zone us-west1-b \
+  --project $PROJECT_ID
+```
+
+Check the output of the startup script:
+
+```shell
+sudo journalctl -u google-startup-scripts.service
+```
+
+The last few lines should confirm that the runner service has started: 
+
+```shell
+...
+google_metadata_script_runner[1450]: Finished running startup scripts.
+systemd[1]: google-startup-scripts.service: Deactivated successfully.
+systemd[1]: Finished Google Compute Engine Startup Scripts.
+```
+
+If not, you can re-run the script, to find the issue: 
+
+```shell
+sudo google_metadata_script_runner startup
+```
+
 ## cleanup
 
 To destroy all resources created by this demo:

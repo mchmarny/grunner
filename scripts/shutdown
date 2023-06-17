@@ -20,8 +20,8 @@ ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS \
 
 # Stop and uninstall the runner service
 cd runner || exit
-sudo ./svc.sh stop
-sudo ./svc.sh uninstall
+./svc.sh stop
+./svc.sh uninstall
 
 # Remove the runner configuration
 RUNNER_ALLOW_RUNASROOT=1 ./config.sh remove \

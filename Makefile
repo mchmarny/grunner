@@ -27,6 +27,10 @@ valid: ## Applies Terraform
 apply: ## Applies Terraform
 	terraform -chdir=./deployments apply -auto-approve
 
+.PHONY: refresh
+refresh: ## Destroy Terraform
+	terraform -chdir=./deployments refresh
+
 .PHONY: destroy
 destroy: ## Destroy Terraform
 	terraform -chdir=./deployments destroy

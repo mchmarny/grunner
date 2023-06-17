@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # install
-sudo apt-get update
-sudo apt-get -y install jq
+apt-get update
+apt-get -y install jq
 
 # access secret from secretsmanager
 secrets=$(gcloud secrets versions access latest --secret="grunner")
@@ -29,7 +29,7 @@ tar xzf ./runner.tar.gz
 rm -f ./runner.tar.gz
 
 # Dependencies
-sudo bin/installdependencies.sh
+bin/installdependencies.sh
 
 # Get config variables 
 ACTIONS_RUNNER_INPUT_NAME=$HOSTNAME
@@ -50,5 +50,5 @@ RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
   --labels grunner
 
 # Install and start runner service
-sudo ./svc.sh install
-sudo ./svc.sh start
+./svc.sh install
+./svc.sh start

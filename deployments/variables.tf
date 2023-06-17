@@ -46,3 +46,9 @@ variable "machine" {
   type        = string
   nullable    = false
 }
+
+variable "token" {
+  description = "GitHub Personal Access Token"
+  type        = string
+  nullable    = false
+}
