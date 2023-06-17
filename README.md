@@ -71,7 +71,7 @@ jobs:
 
 ## debug
 
-If VM starts but you do not see the runners registered in GitHub Settings (https://github.com/$OWNER/$REPO/settings/actions/runners)
+If VM starts but you do not see the runners registered in GitHub Settings.
 
 Start by listing the instances: 
 
