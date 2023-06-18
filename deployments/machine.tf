@@ -6,11 +6,11 @@ resource "google_compute_instance_template" "runner_template" {
   instance_description = "${var.name} vm"
   can_ip_forward       = false
 
-scheduling {
+  scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
-    min_node_cpus = 0
-    provisioning_model = "STANDARD"
+    min_node_cpus       = 0
+    provisioning_model  = "STANDARD"
   }
 
   disk {
@@ -20,7 +20,7 @@ scheduling {
     boot         = true
     auto_delete  = true
     labels = {
-      component   = "runner"
+      component = "runner"
     }
     resource_policies = []
   }
@@ -38,8 +38,8 @@ scheduling {
   }
 
   metadata = {
-    startup-script          = file("../scripts/startup")
-    shutdown-script         = file("../scripts/shutdown")
+    startup-script          = file("../scripts/vm-startup")
+    shutdown-script         = file("../scripts/vm-shutdown")
     enable-guest-attributes = "true"
     enable-osconfig         = "true"
   }

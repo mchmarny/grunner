@@ -8,7 +8,7 @@ Self-hosted GitHub Actions runner on GCP using GCE.
 * Customizable runner:
   * VMs (image type, CPU, memory)
   * MIG (size of runner group)
-* Configurable tooling (startup/shutdown script)
+* Configurable tooling (custom image, startup/shutdown script)
 * User-defined IAM service account
 * Unique GitHub token for each runner
 
@@ -18,10 +18,11 @@ Self-hosted GitHub Actions runner on GCP using GCE.
 
 Since you are interested in self-hosted runners on GCP, you probably already have GCP account and a project. If not, [see](https://cloud.google.com/resource-manager/docs/creating-managing-projects). 
 
-You will also need `gcloud`. You can find instructions on how to install it [here](https://cloud.google.com/sdk/docs/install). Mak sure to authenticate:
+You will also need `gcloud`. You can find instructions on how to install it [here](https://cloud.google.com/sdk/docs/install). Mak sure to authenticate and set the default project:
   
 ```shell
 gcloud auth application-default login
+gcloud config set project $PROJECT_ID
 ```
 
 ## setup 
@@ -34,6 +35,14 @@ Start by initializing the repo:
 scripts/init-repo
 ```
 
+Next, create custom VM image:
+
+> See [scripts/img-startup](scripts/img-startup) for the content of the script that's used to configure the image. Pretty minimal for this demo, you can customize to your needs. 
+
+```shell
+scripts/img
+```
+
 Next, create Terraform variables file: `deployments/terraform.tfvars`:
 
 > Update as necessary. The number of VMs, the image type, and its size will depend on your use-case. The GitHub Personal Access Tokens (PAT) is only needed for obtain registration token for each VM. You can find more about PATs [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
@@ -44,6 +53,7 @@ project = "<your-project-id>"
 region  = "us-west1"
 repo    = "mchmarny/grunner"
 token   = "<github-pat>"
+image   = "<your-project>/<your-custom-image-name>"
 ```
 
 > For complete list of the variables you can define see [deployments/variables.tf](deployments/variables.tf).

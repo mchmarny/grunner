@@ -1,0 +1,84 @@
+#!/bin/bash
+
+apt-get update
+
+# Base
+echo "===> Installing base packages..."
+apt-get -y install \
+  apt-transport-https \
+  jq
+
+# Docker
+echo "===> Installing docker..."
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt-get update
+apt-get install -y \
+  docker-ce \
+  docker-ce-cli \
+  containerd.io \
+  docker-buildx-plugin 
+
+# Golang
+echo "===> Installing golang..."
+GO_VERSION="1.20.5"
+wget "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
+tar -C /usr/local/ -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
+echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+source /etc/profile
+
+# Google Cloud SDK
+echo "===> Installing Google Cloud SDK..."
+REPO_URL="https://packages.cloud.google.com/apt"
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] $REPO_URL cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list
+wget -qO- https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor > /usr/share/keyrings/cloud.google.gpg
+
+apt-get update -y
+apt-get install -y google-cloud-sdk
+
+rm /etc/apt/sources.list.d/google-cloud-sdk.list
+rm /usr/share/keyrings/cloud.google.gpg
+
+# GitHub CLI
+echo "===> Installing GitHub CLI..."
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+&& apt update \
+&& apt install -y gh
+
+# Github runner 
+echo "===> Installing GitHub runner..."
+GH_RUNNER_VERSION="2.305.0"
+mkdir runner && cd runner
+curl -o runner.tar.gz \
+     -L https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz
+tar xzf ./runner.tar.gz
+rm -f ./runner.tar.gz
+bin/installdependencies.sh
+
+# Runner hook for job started and completed
+cat > runner/job-completed.sh <<EOF
+#!/bin/bash
+rm -rf /workspace
+mkdir /workspace
+EOF
+
+# Cleanup
+echo "===> Cleaning up..."
+apt-get autoremove -y
+
+# Print versions
+echo "===> Versions..."
+echo "docker:" && docker version
+echo "gh:" && gh --version
+echo "go:" && go version
+echo "gcloud:" && gcloud version

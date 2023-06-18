@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# install
-apt-get update
-apt-get -y install jq
-
 # access secret from secretsmanager
 secrets=$(gcloud secrets versions access latest --secret="grunner")
 
@@ -15,21 +11,6 @@ done <<< "$secrets"
 
 # Create folders
 mkdir workspace
-mkdir runner && cd runner
-
-# github runner version
-GH_RUNNER_VERSION="2.305.0"
-
-# Download the latest runner package
-curl -o runner.tar.gz \
-     -L https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz
-
-# Extract installer
-tar xzf ./runner.tar.gz
-rm -f ./runner.tar.gz
-
-# Dependencies
-bin/installdependencies.sh
 
 # Get config variables 
 ACTIONS_RUNNER_INPUT_NAME=$HOSTNAME
@@ -40,7 +21,12 @@ ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   "https://api.github.com/repos/${repo}/actions/runners/registration-token" | jq -r .token)"
 
+# Pre and Post job scripts
+# ACTIONS_RUNNER_HOOK_JOB_STARTED="/runner/job-started.sh"
+ACTIONS_RUNNER_HOOK_JOB_COMPLETED="/runner/job-completed.sh"
+
 # Configure runner
+cd runner || exit
 RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
   --unattended \
   --replace \

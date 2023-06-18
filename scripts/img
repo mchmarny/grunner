@@ -1,0 +1,99 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# variables
+VM_NAME="grunner"
+VM_REGION="us-west1"
+VM_ZONE="${VM_REGION}-c"
+
+# derived variables
+PROJECT_ID=$(gcloud config get-value project)
+NOW=$(date +"%Y%m%d%H%M")
+IMAGE="${VM_NAME}-v${NOW}"
+DIR="$(dirname "$0")"
+
+# function to wait for startup script to finish
+wait_startup_finished() {
+    vm_name=$1
+    vm_zone=$2
+    check_interval=3
+    check_limit=100 # 100 * 3 = 300 seconds == 5 minutes
+
+    echo -n "waiting for startup script to finish ..."
+    status=""
+    check_count=0
+
+    sleep 30 # wait before vm is ready for ssh
+
+    while [[ -z "$status" ]]
+    do
+        sleep $check_interval;
+        check_count=$((check_count + 1))
+        if [ "$check_count" -gt "$check_limit" ]; then
+            echo "ERROR: startup script did not finish in time"
+            exit 1
+        fi
+
+        echo -n ".";
+        line=$(gcloud compute ssh $vm_name --zone $vm_zone --ssh-flag="-q" \
+            --command='sudo journalctl -u google-startup-scripts.service | grep -m 1 "startup-script exit status"' 2>/dev/null || true)
+        status=$(echo $line | awk '{print $NF}')
+    done
+
+    if [ "$status" != "0" ]; then
+        echo "ERROR: startup script finished with an invalid exit status: $status"
+        exit 1
+    fi
+}
+
+# start by creating the template VM using the startup script
+echo "creating template VM (${VM_NAME}) using ${DIR}/image-script ..."
+gcloud compute instances create $VM_NAME \
+    --project $PROJECT_ID \
+    --zone $VM_ZONE \
+    --machine-type e2-medium \
+    --scopes https://www.googleapis.com/auth/cloud-platform \
+    --image ubuntu-2204-jammy-v20230616 \
+    --image-project ubuntu-os-cloud \
+    --metadata-from-file "startup-script=${DIR}/img-startup"
+
+# Make sure the startup script has finished executing
+wait_startup_finished $VM_NAME $VM_ZONE
+
+# Print startup script log
+gcloud compute ssh $VM_NAME \
+    --tunnel-through-iap \
+    --project $PROJECT_ID \
+    --zone $VM_ZONE \
+    --ssh-flag="-q" \
+    --command "sudo journalctl -u google-startup-scripts.service"
+
+# stop the VM to prevent data corruption
+echo "stopping template VM (${VM_NAME}) ..."
+gcloud compute instances stop $VM_NAME \
+    --project $PROJECT_ID \
+    --zone $VM_ZONE
+
+# disable auto-delete option for the disk
+echo "disabling disk auto-delete on ${VM_NAME} ..."
+gcloud compute instances set-disk-auto-delete $VM_NAME \
+    --project $PROJECT_ID \
+    --no-auto-delete \
+    --disk $VM_NAME
+
+# Create a new image from the disk
+echo "creating disk image: ${IMAGE} using ${VM_NAME} ..."
+gcloud compute images create $IMAGE \
+    --source-disk $VM_NAME \
+    --source-disk-zone $VM_ZONE \
+    --storage-location us
+
+# Delete the VM
+echo "deleting template VM (${VM_NAME}) ..."
+gcloud compute instances delete $VM_NAME \
+    --project $PROJECT_ID \
+    --zone $VM_ZONE
+
+# Print the image name
+echo "image: ${PROJECT_ID}/${IMAGE}"
