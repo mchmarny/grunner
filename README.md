@@ -40,16 +40,13 @@ Next, create Terraform variables file: `deployments/terraform.tfvars`:
 
 ```shell
 name    = "grunner"
-project = "your-project-id"
+project = "<your-project-id>"
 region  = "us-west1"
-zone    = "c"
-machine = "e2-medium"
-vms     = 3
-image   = "ubuntu-2204-jammy-v20230616"
-size    = 10
 repo    = "mchmarny/grunner"
-token    = "<github-pat>"
+token   = "<github-pat>"
 ```
+
+> For complete list of the variables you can define see [deployments/variables.tf](deployments/variables.tf).
 
 Create GCS bucket to store Terraform state. Couple of things to keep in mind: 
 

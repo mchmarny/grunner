@@ -6,31 +6,35 @@ resource "google_compute_instance_template" "runner_template" {
   instance_description = "${var.name} vm"
   can_ip_forward       = false
 
-  scheduling {
+scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
+    min_node_cpus = 0
+    provisioning_model = "STANDARD"
   }
 
-  # TODO: Parameterize the disk
   disk {
-    disk_type    = "pd-ssd"
+    disk_type    = var.disk
     source_image = var.image
     disk_size_gb = var.size
     boot         = true
     auto_delete  = true
+    labels = {
+      component   = "runner"
+    }
+    resource_policies = []
   }
 
-  // TODO: Put it into a VPC
   network_interface {
     network = data.google_compute_network.default.self_link
     access_config {
-      // Ephemeral public IP
+      network_tier = "PREMIUM"
     }
   }
 
   service_account {
     email  = google_service_account.runner_sa.email
-    scopes = ["cloud-platform"]
+    scopes = var.scopes
   }
 
   metadata = {
@@ -43,13 +47,9 @@ resource "google_compute_instance_template" "runner_template" {
   tags = ["${var.name}"]
 
   labels = {
-    environment = "test"
+    environment = "demo"
     stack       = "github"
     component   = "runner"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
