@@ -11,20 +11,21 @@ all: help
 version: ## Prints the current version
 	@echo $(RELEASE_VERSION)
 
+.PHONY: img
+img: ## Creates the runner image
+	scripts/img
+
 .PHONY: init
 init: ## Runs terraform fmt on all terraform files
 	terraform -chdir=./deployments init
 
-.PHONY: lint
-lint: ## Runs terraform fmt on all terraform files
-	terraform -chdir=./deployments fmt
-
 .PHONY: valid
 valid: ## Applies Terraform
+	terraform -chdir=./deployments fmt
 	terraform -chdir=./deployments validate
 
 .PHONY: apply
-apply: ## Applies Terraform
+apply: valid ## Applies Terraform
 	terraform -chdir=./deployments apply -auto-approve
 
 .PHONY: refresh
@@ -34,6 +35,11 @@ refresh: ## Destroy Terraform
 .PHONY: destroy
 destroy: ## Destroy Terraform
 	terraform -chdir=./deployments destroy
+	scripts/runner-remove
+
+.PHONY: jobless
+jobless: ## Cancels all running jobs
+	scripts/job-cancel
 
 .PHONY: tag
 tag: ## Creates release tag 
