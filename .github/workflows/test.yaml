@@ -6,7 +6,9 @@ permissions:
   contents: read
   
 jobs:
-  show-auth:
+  test:
+    # Only run this job if the push is to the main branch (no PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     name: Test runner
     permissions:
       contents: read
