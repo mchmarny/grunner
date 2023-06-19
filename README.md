@@ -32,7 +32,7 @@ Start by initializing the repo:
 > This will update all repo specific names from the template to your new repo name. 
 
 ```shell
-scripts/init-repo
+scripts/repo-init
 ```
 
 Next, create custom VM image:
