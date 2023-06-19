@@ -22,7 +22,7 @@ ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS \
   "https://api.github.com/repos/${repo}/actions/runners/registration-token" | jq -r .token)"
 
 # Pre and Post job scripts
-# ACTIONS_RUNNER_HOOK_JOB_STARTED="/runner/job-started.sh"
+ACTIONS_RUNNER_HOOK_JOB_STARTED="/runner/job-started.sh"
 ACTIONS_RUNNER_HOOK_JOB_COMPLETED="/runner/job-completed.sh"
 
 # Configure runner
@@ -30,7 +30,7 @@ cd runner || exit
 RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
   --unattended \
   --replace \
-  --work "../workspace" \
+  --work "/workspace" \
   --url "https://github.com/${repo}" \
   --token "$ACTIONS_RUNNER_INPUT_TOKEN" \
   --labels grunner
