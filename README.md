@@ -114,6 +114,10 @@ jobs:
     ...
 ```
 
+## slsa
+
+Even though the runner is different, you can still use the [SLSA Generator](https://github.com/slsa-framework/slsa-github-generator) as is. See the example workload [here](.github/workflows/slsa.yaml), and the resulting SLSA attestation [here](samples/cosign-att-payload.json).
+
 ## debug
 
 If VM starts, but you do not see the runners registered in GitHub settings, start by listing the instances: 
