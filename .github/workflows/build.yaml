@@ -1,4 +1,4 @@
-name: test
+name: build
 
 on:
   push:
@@ -23,6 +23,10 @@ jobs:
     - name: checkout code
       uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v3.5.2
 
+    - name: capture version
+      run: |
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
     - name: setup gcloud
       uses: google-github-actions/setup-gcloud@e30db14379863a8c79331b04a9969f4c1e225e0b  # v1.1.1
 
@@ -37,7 +41,7 @@ jobs:
         images: |
           us-docker.pkg.dev/s3cme1/grunner/simple
         tags: |
-          type=raw,enable=true,value=${{ env.GITHUB_RUN_NUMBER }}
+          "v${GITHUB_RUN_NUMBER}"
 
     - name: Push Image
       id: push
