@@ -41,7 +41,7 @@ jobs:
         images: |
           us-west1-docker.pkg.dev/s3cme1/grunner/simple
         tags: |
-          "v${GITHUB_RUN_NUMBER}"
+          ${{ env.RELEASE_VERSION }}
 
     - name: Push Image
       id: push

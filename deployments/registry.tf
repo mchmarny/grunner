@@ -19,4 +19,3 @@ resource "google_artifact_registry_repository_iam_member" "registry_role_binding
   role       = "roles/artifactregistry.repoAdmin"
   member     = "serviceAccount:${google_service_account.runner_sa.email}"
 }
-
