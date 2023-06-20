@@ -1,0 +1,2 @@
+FROM cgr.dev/chainguard/bash:latest
+CMD [“echo”,”ok”] 
