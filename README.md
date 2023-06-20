@@ -116,9 +116,7 @@ jobs:
 
 ## debug
 
-If VM starts but you do not see the runners registered in GitHub Settings.
-
-Start by listing the instances: 
+If VM starts, but you do not see the runners registered in GitHub settings, start by listing the instances: 
 
 ```shell
 gcloud compute instances list --filter "tags.items=grunner" --project $PROJECT_ID

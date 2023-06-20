@@ -1,5 +1,12 @@
+resource "random_string" "id" {
+  length = 4
+  special = false
+  upper = false
+  numeric = true
+}
+
 resource "google_compute_instance_template" "runner_template" {
-  name         = "${var.name}-template"
+  name         = "${var.name}-template-${random_string.id.result}"
   machine_type = var.machine
   region       = var.region
 
@@ -50,6 +57,10 @@ resource "google_compute_instance_template" "runner_template" {
     environment = "demo"
     stack       = "github"
     component   = "runner"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
