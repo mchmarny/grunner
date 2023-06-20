@@ -17,5 +17,5 @@ resource "google_artifact_registry_repository_iam_member" "registry_role_binding
   location   = var.region
   repository = google_artifact_registry_repository.registry.name
   role       = "roles/artifactregistry.repoAdmin"
-  member     = "serviceAccount:${google_service_account.runner_sa.email}"
+  member     = "serviceAccount:${google_service_account.ci_sa.email}"
 }
