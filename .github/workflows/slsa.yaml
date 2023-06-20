@@ -71,8 +71,6 @@ jobs:
       uses: slsa-framework/slsa-verifier/actions/installer@c9abffe4d2ab2ffa0b2ea9b2582b84164f390adc  # v2.3.0
 
     - name: Verify SLSA Provenance
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.access_token }}
       run: |-
         slsa-verifier verify-image ${{ inputs.image_digest }} \
           --source-uri "github.com/$GITHUB_REPOSITORY" \
