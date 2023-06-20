@@ -39,7 +39,7 @@ jobs:
       uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175  # v4.6.0
       with:
         images: |
-          us-docker.pkg.dev/s3cme1/grunner/simple
+          us-west1-docker.pkg.dev/s3cme1/grunner/simple
         tags: |
           "v${GITHUB_RUN_NUMBER}"
 
