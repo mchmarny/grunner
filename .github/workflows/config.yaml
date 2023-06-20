@@ -1,0 +1,38 @@
+name: config
+
+on:
+  workflow_call:
+    outputs:
+      registry_uri:
+        value: ${{ jobs.conf.outputs.registry_uri }}
+      registry_path:
+        value: ${{ jobs.conf.outputs.registry_path }}
+      provider_path:
+        value: ${{ jobs.conf.outputs.provider_path }}
+      provider_account:
+        value: ${{ jobs.conf.outputs.provider_account }}
+env:
+  REGISTRY_URI: us-west1-docker.pkg.dev
+  REGISTRY_PATH: s3cme1/grunner
+  PROVIDER_PATH: projects/595203407878/locations/global/workloadIdentityPools/grunner-github-pool/providers/github-provider
+  PROVIDER_ACCOUNT: grunner-ci-sa@s3cme1.iam.gserviceaccount.com
+permissions:
+  contents: read
+jobs:
+  conf:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+    outputs:
+      registry_uri: ${{ steps.conf.outputs.registry_uri }}
+      registry_path: ${{ steps.conf.outputs.registry_path }}
+      provider_path: ${{ steps.conf.outputs.provider_path }}
+      provider_account: ${{ steps.conf.outputs.provider_account }}
+    steps:
+    - name: Export Config
+      id: conf
+      run: |
+        echo "registry_uri=${{ env.REGISTRY_URI }}" >> $GITHUB_OUTPUT
+        echo "registry_path=${{ env.REGISTRY_PATH }}" >> $GITHUB_OUTPUT
+        echo "provider_path=${{ env.PROVIDER_PATH }}" >> $GITHUB_OUTPUT
+        echo "provider_account=${{ env.PROVIDER_ACCOUNT }}" >> $GITHUB_OUTPUT

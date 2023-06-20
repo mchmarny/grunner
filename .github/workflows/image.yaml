@@ -1,0 +1,95 @@
+name: image
+
+on:
+  workflow_call:
+    inputs:
+      registry_uri:
+        description: 'Artifact Registry URI'
+        required: true
+        type: string
+      registry_path:
+        description: 'Artifact Registry Path'
+        required: true
+        type: string
+      provider_path:
+        description: 'OIDC provider'
+        required: true
+        type: string
+      provider_account:
+        description: 'Email of the service account'
+        required: true
+        type: string
+      docker_file:
+        description: 'Path to the Dockerfile'
+        required: true
+        type: string
+      image_name:
+        description: 'Name of the image'
+        required: true
+        type: string
+
+    outputs:
+      digest:
+        description: "Digest of the published image"
+        value: ${{ jobs.image.outputs.digest }}
+
+permissions:
+  contents: read
+
+jobs:
+
+  image:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
+    outputs:
+      digest: ${{ steps.image.outputs.digest }}
+    steps:
+
+    - name: Checkout Code
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9  # v3.5.3
+    
+    - name: Capture Version
+      run: |
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    
+    - id: auth
+      name: Get GCP token
+      uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033  # v1.1.1
+      with:
+          token_format: "access_token"
+          workload_identity_provider: ${{ inputs.provider_path }}
+          service_account: ${{ inputs.provider_account }}
+    
+    - name: Define Metadata
+      id: meta
+      uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175  # v4.6.0
+      with:
+        images: |
+          ${{ inputs.registry_uri }}/${{ inputs.registry_path }}/${{ inputs.image_name }}
+        tags: |
+          ${{ env.RELEASE_VERSION }}
+          ${{ env.GITHUB_SHA }}
+    
+    - name: Registry Auth
+      uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc  # v2.2.0
+      with:
+        registry: ${{ inputs.registry_uri }}
+        username: oauth2accesstoken
+        password: ${{ steps.auth.outputs.access_token }}
+    
+    - name: Push Image
+      id: push
+      uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825  # v4.1.1
+      with:
+        file: ${{ inputs.docker_file }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Export Digest
+      id: image
+      run: |
+        echo "digest=${{ inputs.registry_uri }}/${{ inputs.registry_path }}/${{ inputs.image_name }}@${{ steps.push.outputs.digest }}" >> $GITHUB_OUTPUT

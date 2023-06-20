@@ -1,0 +1,45 @@
+name: release
+
+on:  
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+
+  config:
+    uses: ./.github/workflows/config.yaml
+    permissions:
+      contents: read
+
+  image:
+    uses: ./.github/workflows/image.yaml
+    needs: 
+    - config
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
+    with:
+      registry_uri: ${{ needs.config.outputs.registry_uri }}
+      registry_path: ${{ needs.config.outputs.registry_path }}
+      provider_path: ${{ needs.config.outputs.provider_path }}
+      provider_account: ${{ needs.config.outputs.provider_account }}
+      docker_file: samples/Dockerfile.simple
+      image_name: simple
+            
+  slsa:
+    uses: ./.github/workflows/slsa.yaml
+    needs: 
+    - config
+    - image
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: write
+      security-events: write
+    with:
+      image_digest: ${{ needs.image.outputs.digest }}
+      auth_provider: ${{ needs.config.outputs.provider_path }}
+      auth_user: ${{ needs.config.outputs.provider_account }}

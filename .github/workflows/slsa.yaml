@@ -1,0 +1,76 @@
+name: provenance
+
+on:
+  workflow_call:
+    inputs:
+      image_digest:
+        description: 'Fully-qualified image digest to verify (registry/image@sha256:digest)'
+        required: true
+        type: string
+      auth_provider:
+        description: 'OIDC provider ID'
+        required: true
+        type: string
+      auth_user:
+        description: 'OIDC user ID'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+
+  config:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+    outputs:
+      image: ${{ steps.split.outputs.image }}
+      digest: ${{ steps.split.outputs.digest }}
+    steps:
+    - name: Export Config
+      id: split
+      run: |
+        echo "image=$(echo ${{ inputs.image_digest }} | cut -d@ -f1)" >> $GITHUB_OUTPUT
+        echo "digest=$(echo ${{ inputs.image_digest }} | cut -d@ -f2)" >> $GITHUB_OUTPUT
+
+  provenance:
+    needs:
+    - config
+    permissions:
+      actions: read
+      id-token: write
+      packages: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.7.0
+    with:
+      image: ${{ needs.config.outputs.image }}
+      digest: ${{ needs.config.outputs.digest }}
+      registry-username: ${{ github.actor }}
+      gcp-workload-identity-provider: ${{ inputs.auth_provider }}
+      gcp-service-account: ${{ inputs.auth_user }}
+
+  verify:
+    needs:
+    - provenance
+    runs-on: self-hosted
+    permissions:
+      actions: read
+      id-token: write
+    steps:
+
+    - id: auth
+      name: Auth GCP
+      uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033  # v1.1.1
+      with:
+        token_format: "access_token"
+        workload_identity_provider: ${{ inputs.auth_provider }}
+        service_account: ${{ inputs.auth_user }}
+
+    - uses: slsa-framework/slsa-verifier/actions/installer@c9abffe4d2ab2ffa0b2ea9b2582b84164f390adc  # v2.3.0
+
+    - name: Verify SLSA Provenance
+      run: |-
+        slsa-verifier verify-image ${{ inputs.image_digest }} \
+          --source-uri "github.com/$GITHUB_REPOSITORY" \
+          --source-tag "$GITHUB_REF_NAME"
