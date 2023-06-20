@@ -15,6 +15,14 @@ jobs:
     runs-on: self-hosted
 
     steps:
+
+    - run: |-
+        echo "system:"
+        env
+        echo "github:"
+        echo "$GITHUB_ENV"
+
+
     - name: Checkout Code
       uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v3.5.2
 
@@ -22,4 +30,5 @@ jobs:
       uses: google-github-actions/setup-gcloud@e30db14379863a8c79331b04a9969f4c1e225e0b  # v1.1.1
 
     - run: |-
+        gcloud info
         gcloud auth list
