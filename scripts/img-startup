@@ -75,14 +75,12 @@ bin/installdependencies.sh
 # Runner hook for job started and completed, alter as needed
 cat >job-started.sh <<EOF
 #!/bin/bash
-env
 echo "job started"
 EOF
 chmod +x job-started.sh
 
 cat >job-completed.sh <<EOF
 #!/bin/bash
-env
 echo "job completed"
 rm -rf /workspace
 mkdir /workspace
