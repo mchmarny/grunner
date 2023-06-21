@@ -23,15 +23,15 @@ resource "google_project_iam_member" "ci_role_bindings" {
 }
 
 # Identiy pool for GitHub action based identity's access to Google Cloud resources
-resource "google_iam_workload_identity_pool" "github_pool" {
+resource "google_iam_workload_identity_pool" "pool" {
   provider                  = google-beta
-  workload_identity_pool_id = "${var.name}-github-pool"
+  workload_identity_pool_id = var.name
 }
 
 # Configuration for GitHub identiy provider
-resource "google_iam_workload_identity_pool_provider" "github_provider" {
+resource "google_iam_workload_identity_pool_provider" "pool_provider" {
   provider                           = google-beta
-  workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
+  workload_identity_pool_id          = google_iam_workload_identity_pool.pool.workload_identity_pool_id
   workload_identity_pool_provider_id = "github-provider"
   attribute_mapping = {
     "google.subject"       = "assertion.sub"
@@ -50,5 +50,5 @@ resource "google_service_account_iam_member" "pool_impersonation" {
   provider           = google-beta
   service_account_id = google_service_account.ci_sa.id
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.repo}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.pool.name}/attribute.repository/${var.repo}"
 }

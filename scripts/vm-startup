@@ -29,7 +29,7 @@ ACTIONS_RUNNER_HOOK_JOB_COMPLETED="/runner/job-completed.sh"
 cd runner || exit
 RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
   --unattended \
-  --replace \
+  --ephemeral \
   --work "/workspace" \
   --url "https://github.com/${repo}" \
   --token "$ACTIONS_RUNNER_INPUT_TOKEN" \

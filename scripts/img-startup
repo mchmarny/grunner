@@ -83,7 +83,6 @@ cat >job-completed.sh <<EOF
 #!/bin/bash
 echo "job completed"
 rm -rf /workspace
-mkdir /workspace
 EOF
 chmod +x job-completed.sh
 

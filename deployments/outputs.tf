@@ -21,6 +21,6 @@ output "CI_SERVICE_ACCOUNT" {
 }
 
 output "CI_IDENTITY_PROVIDER" {
-  value       = google_iam_workload_identity_pool_provider.github_provider.name
+  value       = google_iam_workload_identity_pool_provider.pool_provider.name
   description = "Provider ID to use in Auth action for GCP in GitHub."
 }

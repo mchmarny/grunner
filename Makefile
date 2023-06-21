@@ -11,8 +11,8 @@ all: help
 version: ## Prints the current version
 	@echo $(RELEASE_VERSION)
 
-.PHONY: img
-img: ## Creates the runner image
+.PHONY: image
+image: ## Creates the runner image
 	scripts/img
 
 .PHONY: init
