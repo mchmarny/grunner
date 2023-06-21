@@ -1,9 +1,0 @@
-{
-  "image_summary": {
-    "digest": "sha256:b3c77ed6a157c14ed91584f21723d5ba9bbf8ea5586e2dea5ac6ea120e3d2271",
-    "fully_qualified_digest": "us-west1-docker.pkg.dev/s3cme1/grunner/simple@sha256:b3c77ed6a157c14ed91584f21723d5ba9bbf8ea5586e2dea5ac6ea120e3d2271",
-    "registry": "us-west1-docker.pkg.dev",
-    "repository": "grunner",
-    "slsa_build_level": "unknown"
-  }
-}
