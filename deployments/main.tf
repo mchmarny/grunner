@@ -33,3 +33,10 @@ resource "google_project_service" "default" {
 
   disable_on_destroy = false
 }
+
+resource "random_string" "id" {
+  length  = 4
+  special = false
+  upper   = false
+  numeric = true
+}

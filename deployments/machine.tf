@@ -1,10 +1,3 @@
-resource "random_string" "id" {
-  length  = 4
-  special = false
-  upper   = false
-  numeric = true
-}
-
 resource "google_compute_instance_template" "runner_template" {
   name         = "${var.name}-template-${random_string.id.result}"
   machine_type = var.machine
@@ -74,5 +67,27 @@ resource "google_compute_region_instance_group_manager" "mig" {
   version {
     name              = "${var.name} template"
     instance_template = google_compute_instance_template.runner_template.self_link_unique
+  }
+
+  auto_healing_policies {
+    health_check      = google_compute_health_check.health_check.id
+    initial_delay_sec = 300 # 5 minutes, needs to wait for SSH to be up
+  }
+}
+
+resource "google_compute_health_check" "health_check" {
+  provider = google-beta
+  name = "${var.name}-health-check"
+
+  timeout_sec        = 5
+  check_interval_sec = 5
+  unhealthy_threshold = 3
+
+  tcp_health_check {
+    port = "22"
+  }
+
+  log_config {
+    enable = true
   }
 }
