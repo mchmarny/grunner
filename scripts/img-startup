@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Don't exit on error or check for undefined variables here, as this script is run as part of the image creation process and some of the commands will fail.
+# Disable apt prompts
+export DEBIAN_FRONTEND="noninteractive"
+echo ACCEPT_EULA=Y | tee -a /etc/environment
 
 log() {
   printf '>>> %s\n' "$@"
@@ -37,7 +39,7 @@ apt-get install -y \
   docker-ce \
   docker-ce-cli \
   containerd.io \
-  docker-buildx-plugin 
+  docker-buildx-plugin
 
 # Golang
 log "Installing golang"
@@ -85,19 +87,24 @@ echo "job started"
 EOF
 chmod +x job-started.sh
 
-ZONE=$(gcloud compute instances list --filter=$(hostname) --format='csv[no-heading](zone)')
-
 cat >job-completed.sh <<EOF
 #!/bin/bash
-echo "job completed"
+echo "job completed, starting cleanup"
 rm -rf /workspace
-gcloud compute instances delete $(hostname) --quiet --zone $ZONE
+shutdown -h now
 EOF
 chmod +x job-completed.sh
 
 # Cleanup
 log "Cleaning up"
 apt-get autoremove -y
+journalctl --flush --rotate --vacuum-time=1s
+rm -rf /var/log/journal/*
+rm -rf /var/lib/apt/lists/*
+rm -rf /var/cache/apt/archives/*
+rm -rf /var/cache/apt/*.bin
+rm -rf /var/tmp/*
+rm -rf /tmp/*
 
 # Print versions
 log "Versions:"

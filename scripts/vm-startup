@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Extract data from the Google metadata service
+_get_metadata() {
+  curl -sSfL "http://metadata.google.internal/computeMetadata/v1/${1}" \
+    --header "Metadata-Flavor: Google"
+}
+
+# Capture configuration and credentials from instance metadata
+GOOGLE_CLOUD_PROJECT="$(_get_metadata "project/project-id")"
+INSTANCE_ID="$(_get_metadata "instance/id")"
+INSTANCE_ZONE="$(_get_metadata "instance/zone")"
+
 # access secret from secretsmanager
 secrets=$(gcloud secrets versions access latest --secret="grunner")
 
@@ -34,6 +45,10 @@ RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
   --url "https://github.com/${repo}" \
   --token "$ACTIONS_RUNNER_INPUT_TOKEN" \
   --labels grunner
+
+# Upgrade ops agent
+curl -sSo agent.sh https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+/usr/bin/env bash agent.sh --also-install
 
 # Install and start runner service
 ./svc.sh install

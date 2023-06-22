@@ -19,8 +19,8 @@ variable "region" {
 }
 
 variable "vms" {
-  description = "Managed instance group size (default: 3)"
-  default     = 3
+  description = "Managed instance group size (default: 4)"
+  default     = 4
   type        = number
 }
 
