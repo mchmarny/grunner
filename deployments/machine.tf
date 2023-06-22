@@ -42,6 +42,7 @@ resource "google_compute_instance_template" "runner_template" {
     shutdown-script         = file("../scripts/vm-shutdown")
     enable-guest-attributes = "true"
     enable-osconfig         = "true"
+    google-logging-enabled = "true"
   }
 
   tags = ["${var.name}"]
@@ -77,10 +78,10 @@ resource "google_compute_region_instance_group_manager" "mig" {
 
 resource "google_compute_health_check" "health_check" {
   provider = google-beta
-  name = "${var.name}-health-check"
+  name     = "${var.name}-health-check"
 
-  timeout_sec        = 5
-  check_interval_sec = 5
+  timeout_sec         = 5
+  check_interval_sec  = 5
   unhealthy_threshold = 3
 
   tcp_health_check {

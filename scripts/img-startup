@@ -79,12 +79,13 @@ echo "job started"
 EOF
 chmod +x job-started.sh
 
+ZONE=$(gcloud compute instances list --filter=$(hostname) --format='csv[no-heading](zone)')
+
 cat >job-completed.sh <<EOF
 #!/bin/bash
 echo "job completed"
 rm -rf /workspace
-ZONE=$(gcloud compute instances list --filter=$(hostname) --format 'csv[no-heading](zone)')
-gcloud compute instances delete $(hostname) --quiet --zone="$ZONE"
+gcloud compute instances delete $(hostname) --quiet --zone $ZONE
 EOF
 chmod +x job-completed.sh
 
