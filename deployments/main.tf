@@ -9,6 +9,7 @@ locals {
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "monitoring.googleapis.com",
+    "networkmanagement.googleapis.com",
     "secretmanager.googleapis.com",
     "servicecontrol.googleapis.com",
     "servicemanagement.googleapis.com",
@@ -19,13 +20,8 @@ locals {
 # Data source to access GCP project metadata 
 data "google_project" "project" {}
 
-# Data source to default GCP network
-data "google_compute_network" "default" {
-  name = "default"
-}
-
 # Enable the required GCP APIs
-resource "google_project_service" "default" {
+resource "google_project_service" "services" {
   for_each = toset(local.services)
 
   project = var.project

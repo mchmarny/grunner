@@ -1,4 +1,5 @@
-resource "google_compute_instance_template" "runner_template" {
+resource "google_compute_instance_template" "runner" {
+  provider     = google-beta
   name         = "${var.name}-template-${random_string.id.result}"
   machine_type = var.machine
   region       = var.region
@@ -26,10 +27,8 @@ resource "google_compute_instance_template" "runner_template" {
   }
 
   network_interface {
-    network = data.google_compute_network.default.self_link
-    access_config {
-      network_tier = "PREMIUM"
-    }
+    subnetwork_project = var.project
+    subnetwork         = google_compute_subnetwork.runners.id
   }
 
   service_account {
@@ -42,7 +41,7 @@ resource "google_compute_instance_template" "runner_template" {
     shutdown-script         = file("../scripts/vm-shutdown")
     enable-guest-attributes = "true"
     enable-osconfig         = "true"
-    google-logging-enabled = "true"
+    google-logging-enabled  = "true"
   }
 
   tags = ["${var.name}"]
@@ -56,10 +55,15 @@ resource "google_compute_instance_template" "runner_template" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [
+    google_project_service.services["compute.googleapis.com"],
+  ]
 }
 
 
 resource "google_compute_region_instance_group_manager" "mig" {
+  provider           = google-beta
   name               = "${var.name}-mig"
   region             = var.region
   base_instance_name = var.name
@@ -67,12 +71,22 @@ resource "google_compute_region_instance_group_manager" "mig" {
 
   version {
     name              = "${var.name} template"
-    instance_template = google_compute_instance_template.runner_template.self_link_unique
+    instance_template = google_compute_instance_template.runner.self_link_unique
   }
 
   auto_healing_policies {
     health_check      = google_compute_health_check.health_check.id
     initial_delay_sec = 300 # 5 minutes, needs to wait for SSH to be up
+  }
+
+  update_policy {
+    type                         = "PROACTIVE"
+    instance_redistribution_type = "PROACTIVE"
+    minimal_action               = "REPLACE"
+    max_surge_fixed              = 3
+    max_unavailable_fixed        = 3
+    min_ready_sec                = 120
+    replacement_method           = "SUBSTITUTE"
   }
 }
 
