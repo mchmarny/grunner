@@ -6,13 +6,19 @@ log() {
   printf '>>> %s\n' "$@"
 }
 
+# Updates
 apt-get update
+apt-get upgrade
+apt-get dist-upgrade
+apt-get full-upgrade
 
 # Base
 log "Installing base packages"
 apt-get -y install \
   apt-transport-https \
-  jq
+  jq \
+  lsb-release \
+  software-properties-common
 
 # Docker
 log "Installing docker"
