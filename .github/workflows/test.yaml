@@ -10,10 +10,17 @@ permissions:
   contents: read
   
 jobs:
+
+  config:
+    uses: ./.github/workflows/config.yaml
+    permissions:
+      contents: read
+
   test:
-    # Only run this job if the push is to the main branch (no PRs)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     name: Test runner
+    needs:
+    - config
     permissions:
       contents: read
     runs-on: self-hosted
@@ -26,6 +33,12 @@ jobs:
 
     - name: checkout code
       uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v3.5.2
+
+    - name: get auth
+      uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033  # v1.1.1
+      with:
+          workload_identity_provider: ${{ needs.config.outputs.provider_path }}
+          service_account: ${{ needs.config.outputs.provider_account }}
 
     - name: setup gcloud
       uses: google-github-actions/setup-gcloud@e30db14379863a8c79331b04a9969f4c1e225e0b  # v1.1.1
