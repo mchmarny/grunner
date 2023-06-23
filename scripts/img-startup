@@ -75,6 +75,7 @@ curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of
 # Github runner 
 log "Installing GitHub runner"
 GH_RUNNER_VERSION="2.305.0"
+mkdir -p /workspace
 mkdir -p /runner && cd /runner
 curl -o runner.tar.gz \
      -L https://github.com/actions/runner/releases/download/v${GH_RUNNER_VERSION}/actions-runner-linux-x64-${GH_RUNNER_VERSION}.tar.gz
@@ -83,24 +84,31 @@ rm -f ./runner.tar.gz
 bin/installdependencies.sh
 
 # Runner hook for job started and completed, alter as needed
+mkdir -p /var/runner && cd /var/runner
+
 cat > job-started.sh <<"EOF"
 #!/usr/bin/env bash
 echo "job started"
 EOF
-chmod +x job-started.sh
 
 cat > job-completed.sh <<"EOF"
 #!/usr/bin/env bash
 echo "job completed, starting cleanup"
 gcloud compute instances delete $(hostname) --quiet --zone $(gcloud compute instances list --filter=$(hostname) --format='value(zone)')
 EOF
+
+chmod +x job-started.sh
 chmod +x job-completed.sh
+
+# Wire pre/post job scripts
+echo ACTIONS_RUNNER_HOOK_JOB_STARTED=/var/runner/job-started.sh | tee -a /etc/environment
+echo ACTIONS_RUNNER_HOOK_JOB_COMPLETED=/var/runner/job-completed.sh | tee -a /etc/environment
 
 # Cleanup
 log "Cleaning up"
 apt-get clean -y
 apt-get autoremove -y
-journalctl --flush --rotate --vacuum-time=1s
+journalctl --flush --rotate --vacuum-time=2s
 rm -rf /var/lib/apt/lists/*
 rm -rf /var/cache/apt/archives/*
 rm -rf /var/cache/apt/*.bin
