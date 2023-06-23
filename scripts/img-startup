@@ -91,8 +91,9 @@ EOF
 
 cat > job-completed.sh <<"EOF"
 #!/bin/bash
-echo "job completed, starting cleanup"
-gcloud compute instances delete $(hostname) --quiet --zone $(gcloud compute instances list --filter=$(hostname) --format='value(zone)')
+echo "job completed, starting cleanup: $(hostname)"
+(sleep 30 ; gcloud compute instances delete $(hostname) --quiet --zone $(gcloud compute instances list --filter=$(hostname) --format='value(zone)')) &
+echo "cleanup completed"
 EOF
 
 chmod +x ./job-started.sh
