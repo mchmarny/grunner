@@ -86,13 +86,13 @@ bin/installdependencies.sh
 
 cat > job-started.sh <<"EOF"
 #!/bin/bash
-echo "job started"
+echo "job started: $(hostname)"
 EOF
 
 cat > job-completed.sh <<"EOF"
 #!/bin/bash
 echo "job completed, starting cleanup: $(hostname)"
-(sleep 30 ; gcloud compute instances delete $(hostname) --quiet --zone $(gcloud compute instances list --filter=$(hostname) --format='value(zone)')) &
+nohup gcloud compute instances delete $(hostname) --quiet --zone $(gcloud compute instances list --filter=$(hostname) --format='value(zone)') &
 echo "cleanup completed"
 EOF
 
