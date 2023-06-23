@@ -74,7 +74,8 @@ curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of
 
 # Github runner 
 log "Installing GitHub runner"
-GH_RUNNER_VERSION="2.305.0"
+GH_RUNNER_VERSION="$(curl -sSfL "https://api.github.com/repos/actions/runner/releases/latest" | jq -r ".tag_name")"
+GH_RUNNER_VERSION="${GH_RUNNER_VERSION:1}" # trim leading "v"
 mkdir -p /workspace
 mkdir -p /runner && cd /runner
 curl -o runner.tar.gz \
@@ -108,7 +109,6 @@ echo ACTIONS_RUNNER_HOOK_JOB_COMPLETED=/var/runner/job-completed.sh | tee -a /et
 log "Cleaning up"
 apt-get clean -y
 apt-get autoremove -y
-journalctl --flush --rotate --vacuum-time=2s
 rm -rf /var/lib/apt/lists/*
 rm -rf /var/cache/apt/archives/*
 rm -rf /var/cache/apt/*.bin
@@ -118,6 +118,7 @@ rm -rf /tmp/*
 find /var/log -type f -regex ".*\.gz$" -delete
 find /var/log -type f -regex ".*\.[0-9]$" -delete
 find /var/log/ -type f -exec cp /dev/null {} \;
+journalctl --flush --rotate --vacuum-time=2s
 
 # Print versions
 log "Versions:"

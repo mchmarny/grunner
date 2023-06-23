@@ -24,12 +24,11 @@ fi;
 gcloud services enable compute.googleapis.com --project $PROJECT
 
 # variables
-NAME="grunner"
+NAME="grunner-template-vm"
 ZONE="${REGION}-c"
 NOW=$(date +"%Y%m%d%H%M")
 IMAGE="${NAME}-v${NOW}"
 DIR="$(dirname "$0")"
-TAG="temp-template-vm"
 
 # function to print log
 log() {
@@ -75,12 +74,14 @@ wait_startup_finished() {
         echo "ERROR: startup script finished with an invalid exit status: $status"
         exit 1
     fi
+
+    echo " done"
 }
 
 # delete old VM if it already exists
 old=$(gcloud compute instances list \
     --project $PROJECT \
-    --filter "name=( ${NAME} )" \
+    --filter $NAME \
     --format "value(name)")
 if [[ ! -z "$old" ]]; then
     log "Deleting existing template VM: ${NAME}"
@@ -96,22 +97,13 @@ gcloud compute instances create $NAME \
     --scopes https://www.googleapis.com/auth/cloud-platform \
     --image ubuntu-2204-jammy-v20230616 \
     --image-project ubuntu-os-cloud \
-    --tags $TAG \
     --metadata-from-file "startup-script=${DIR}/img-startup"
 
 # Make sure the startup script has finished executing
 wait_startup_finished $NAME $ZONE
 
-# Print startup script log
-gcloud compute ssh $NAME \
-    --tunnel-through-iap \
-    --project $PROJECT \
-    --zone $ZONE \
-    --ssh-flag="-q" \
-    --command "sudo journalctl -u google-startup-scripts.service"
-
 # stop the VM to prevent data corruption
-log "Stopping template VM (${NAME})"
+log "Stopping template VM (${NAME}/$ZONE)"
 gcloud compute instances stop $NAME \
     --project $PROJECT \
     --zone $ZONE

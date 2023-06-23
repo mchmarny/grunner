@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# validation and defaults
+gcloud=$(which gcloud) || ( echo "gcloud not found" && exit 1 )
+
+PROJECT=$(gcloud config get-value project)
+if [[ -z "${PROJECT}" ]]; then
+  echo "PROJECT not set, 'gcloud config set project <your-project-id>'."
+  exit 1
+fi;
+
+REGION=$(gcloud config get-value compute/region)
+if [[ -z "${REGION}" ]]; then
+  REGION="us-west1"
+fi;
+
+# ensure apis are enabled
+gcloud services enable compute.googleapis.com --project $PROJECT
+
+# variables
+NAME="grunner"
+ZONE="${REGION}-c"
+
+gcloud compute ssh $NAME \
+    --tunnel-through-iap \
+    --project $PROJECT \
+    --zone $ZONE \
+    --ssh-flag="-q" \
+    --command "sudo journalctl -u google-startup-scripts.service"
