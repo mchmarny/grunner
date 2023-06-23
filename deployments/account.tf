@@ -5,8 +5,10 @@ locals {
     "roles/compute.networkUser",
     "roles/iam.serviceAccountTokenCreator",
     "roles/iam.serviceAccountUser",
+    "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
     "roles/secretmanager.secretAccessor",
+    "roles/stackdriver.resourceMetadata.writer",
   ])
 }
 
