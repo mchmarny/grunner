@@ -31,8 +31,8 @@ ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS \
   "https://api.github.com/repos/${repo}/actions/runners/registration-token" | jq -r .token)"
 
 # Wire pre/post job scripts
-ACTIONS_RUNNER_HOOK_JOB_STARTED="/runner/job-started.sh"
-ACTIONS_RUNNER_HOOK_JOB_COMPLETED="/runner/job-completed.sh"
+echo ACTIONS_RUNNER_HOOK_JOB_STARTED=/runner/job-started.sh | tee -a /etc/environment
+echo ACTIONS_RUNNER_HOOK_JOB_COMPLETED=/runner/job-completed.sh | tee -a /etc/environment
 
 # Configure runner
 cd runner || exit

@@ -21,9 +21,7 @@ if [[ -z "${REGION}" ]]; then
 fi;
 
 # ensure apis are enabled
-gcloud services enable \
-    compute.googleapis.com \
-    --project $PROJECT
+gcloud services enable compute.googleapis.com --project $PROJECT
 
 # variables
 NAME="grunner"
