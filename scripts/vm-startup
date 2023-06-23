@@ -32,6 +32,7 @@ cd /runner || exit
 RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
   --unattended \
   --ephemeral \
+  --replace \
   --work "/workspace" \
   --url "https://github.com/${repo}" \
   --token "$ACTIONS_RUNNER_INPUT_TOKEN" \

@@ -17,7 +17,7 @@ ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS \
   "https://api.github.com/repos/${repo}/actions/runners/registration-token" | jq -r .token)"
 
 # Stop and uninstall the runner service
-cd runner || exit
+cd /runner || exit
 ./svc.sh stop
 ./svc.sh uninstall
 
