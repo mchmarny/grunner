@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Sample of a purpose build image for GitHub Actions for specific repo.
+# Customize as needed for your own use case.
+
 # Disable apt prompts
 export DEBIAN_FRONTEND="noninteractive"
 echo ACCEPT_EULA=Y | tee -a /etc/environment

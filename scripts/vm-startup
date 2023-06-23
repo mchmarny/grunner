@@ -1,26 +1,24 @@
 #!/bin/bash
 
 # Extract data from the Google metadata service
-_get_metadata() {
+getmd() {
   curl -sSfL "http://metadata.google.internal/computeMetadata/v1/${1}" \
     --header "Metadata-Flavor: Google"
 }
 
 # Capture configuration and credentials from instance metadata
-GOOGLE_CLOUD_PROJECT="$(_get_metadata "project/project-id")"
-INSTANCE_ID="$(_get_metadata "instance/id")"
-INSTANCE_ZONE="$(_get_metadata "instance/zone")"
+GOOGLE_CLOUD_PROJECT="$(getmd "project/project-id")"
+INSTANCE_ID="$(getmd "instance/id")"
+INSTANCE_ZONE="$(getmd "instance/zone")"
 
-# access secret from secretsmanager
+# Load Secrets from Secret Manager
 secrets=$(gcloud secrets versions access latest --secret="grunner")
-
-# set secrets as env vars
 while IFS= read -r line; do
     var="$(echo -e "${line}" | tr -d '[:space:]' | tr -d '"')"
     export "${var?}"
 done <<< "$secrets"
 
-# Create folders
+# Create workspace folders
 mkdir workspace
 
 # Get config variables 
@@ -32,7 +30,7 @@ ACTIONS_RUNNER_INPUT_TOKEN="$(curl -sS \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   "https://api.github.com/repos/${repo}/actions/runners/registration-token" | jq -r .token)"
 
-# Pre and Post job scripts
+# Wire pre/post job scripts
 ACTIONS_RUNNER_HOOK_JOB_STARTED="/runner/job-started.sh"
 ACTIONS_RUNNER_HOOK_JOB_COMPLETED="/runner/job-completed.sh"
 
@@ -46,10 +44,11 @@ RUNNER_ALLOW_RUNASROOT=1 ./config.sh \
   --token "$ACTIONS_RUNNER_INPUT_TOKEN" \
   --labels grunner
 
-# Upgrade ops agent
-curl -sSo agent.sh https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
-/usr/bin/env bash agent.sh --also-install
-
 # Install and start runner service
 ./svc.sh install
 ./svc.sh start
+
+# Add ops agent
+curl -sSo agent.sh https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+chmod +x agent.sh
+./agent.sh --also-install

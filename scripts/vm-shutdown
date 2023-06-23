@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# access secret from secretsmanager
+# Load Secrets from Secret Manager
 secrets=$(gcloud secrets versions access latest --secret="grunner")
-
-# set secrets as env vars
 while IFS= read -r line; do
     var="$(echo -e "${line}" | tr -d '[:space:]' | tr -d '"')"
     export "${var?}"
