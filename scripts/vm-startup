@@ -6,6 +6,10 @@ getmd() {
     --header "Metadata-Flavor: Google"
 }
 
+# Change ownership
+chown -R "root:root" /runner/
+chown -R "root:root" /workspace/
+
 # Capture configuration and credentials from instance metadata
 GOOGLE_CLOUD_PROJECT="$(getmd "project/project-id")"
 INSTANCE_ID="$(getmd "instance/id")"

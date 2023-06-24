@@ -35,11 +35,11 @@ resource "google_compute_instance_template" "runner" {
   }
 
   metadata = {
-    startup-script          = file("../scripts/vm-startup")
-    shutdown-script         = file("../scripts/vm-shutdown")
-    enable-guest-attributes = "true"
-    enable-osconfig         = "true"
-    google-logging-enabled  = "true"
+    startup-script               = file("../scripts/vm-startup")
+    shutdown-script              = file("../scripts/vm-shutdown")
+    google-logging-enabled       = "true"
+    google-logging-use-fluentbit = "true"
+    google-monitoring-enabled    = "true"
   }
 
   tags = ["${var.name}"]
@@ -78,13 +78,16 @@ resource "google_compute_region_instance_group_manager" "mig" {
   }
 
   update_policy {
-    type                         = "PROACTIVE"
-    instance_redistribution_type = "PROACTIVE"
-    minimal_action               = "REPLACE"
-    replacement_method           = "SUBSTITUTE"
-    max_surge_fixed              = 4
-    max_unavailable_fixed        = 4
+    type                           = "PROACTIVE"
+    instance_redistribution_type   = "PROACTIVE"
+    minimal_action                 = "REPLACE"
+    most_disruptive_allowed_action = "REPLACE"
+    replacement_method             = "RECREATE"
+    max_surge_fixed                = 0
+    max_unavailable_fixed          = 4
   }
+
+  all_instances_config {}
 }
 
 resource "google_compute_health_check" "health_check" {
