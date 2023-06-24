@@ -5,8 +5,8 @@ Self-hosted GitHub Actions runner on GCP using GCE.
 ![](assets/overview.png)
 
 * Ephemeral VMs in Managed Instance Group (MIG)
-* VM Per workflow job to isolate state between jobs
-* Unique GitHub token for each runner instance
+* Each VM instance processes maximum of one workflow job
+* Each runner provisioned with its own GiHub token
 * Configurable worker pool (size, machine type, CPU, memory, accelerators)
 * User-defined IAM service account
 * Customizable runner image with startup/shutdown script hooks
