@@ -10,13 +10,13 @@ log() {
   printf '>>> %s\n' "$@"
 }
 
-# Updates
+# OS Updates
 apt-get update
 apt-get upgrade
 apt-get dist-upgrade
 apt-get full-upgrade
 
-# Base
+# Core packages
 log "Installing base packages"
 apt-get -y install \
   apt-transport-https \
@@ -52,7 +52,7 @@ rm "go${GO_VERSION}.linux-amd64.tar.gz"
 echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
 source /etc/profile
 
-# Google Cloud SDK
+# GCP SDK
 log "Installing Google Cloud SDK"
 REPO_URL="https://packages.cloud.google.com/apt"
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] $REPO_URL cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -84,15 +84,20 @@ tar xzf ./runner.tar.gz
 rm -f ./runner.tar.gz
 bin/installdependencies.sh
 
+# This script is run before the job is started.
+# Just print the hostname to stdout for now.
 cat > job-started.sh <<"EOF"
 #!/bin/bash
 echo "job started: $(hostname)"
 EOF
 
+# This script is run after the job is completed.
+# It is used to shutdown SSH, which health check detects and restarts the VM.
 cat > job-completed.sh <<"EOF"
 #!/bin/bash
-echo "job completed, starting cleanup: $(hostname)"
-nohup gcloud compute instances delete $(hostname) --quiet --zone $(gcloud compute instances list --filter=$(hostname) --format='value(zone)') &
+echo "cleanup started: $(hostname)"
+systemctl stop ssh
+systemctl disable ssh
 echo "cleanup completed"
 EOF
 
@@ -103,7 +108,11 @@ chmod +x ./job-completed.sh
 echo ACTIONS_RUNNER_HOOK_JOB_STARTED=/runner/job-started.sh | tee -a .env
 echo ACTIONS_RUNNER_HOOK_JOB_COMPLETED=/runner/job-completed.sh | tee -a .env
 
-# Cleanup
+# Change ownership
+chown -R "root:root" /runner/
+chown -R "root:root" /workspace/
+
+# Cleanup image
 log "Cleaning up"
 apt-get clean -y
 apt-get autoremove -y
@@ -116,11 +125,4 @@ rm -rf /tmp/*
 find /var/log -type f -regex ".*\.gz$" -delete
 find /var/log -type f -regex ".*\.[0-9]$" -delete
 find /var/log/ -type f -exec cp /dev/null {} \;
-journalctl --flush --rotate --vacuum-time=2s
-
-# Print versions
-log "Versions:"
-echo "docker:" && docker version
-echo "gh:" && gh --version
-echo "go:" && go version
-echo "gcloud:" && gcloud version
+journalctl --flush --rotate --vacuum-time=1s

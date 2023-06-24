@@ -1,7 +1,6 @@
 locals {
   # List of roles that will be assigned to the runner service account
   runner_roles = toset([
-    "roles/compute.instanceAdmin",
     "roles/compute.networkUser",
     "roles/iam.serviceAccountTokenCreator",
     "roles/iam.serviceAccountUser",
