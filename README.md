@@ -4,13 +4,14 @@ Self-hosted GitHub Actions runner on GCP using GCE.
 
 ![](assets/overview.png)
 
+Terraform provisioning for: 
+
 * Ephemeral VMs in Managed Instance Group (MIG)
 * Each VM instance processes maximum of one workflow job
 * Each runner provisioned with its own GiHub token
 * Configurable worker pool (size, machine type, CPU, memory, accelerators)
-* User-defined IAM service account
+* VPC and VPC Service Controls with User-defined IAM service account, roles
 * Customizable runner image with startup/shutdown script hooks
-* Terraform provisioning 
 
 ## prerequisites
 
